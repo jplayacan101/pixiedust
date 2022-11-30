@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <title>View Order</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1 class="text-center text-primary mt-3 mb-3"><%= title %></h1>
+            <% if(action == 'list') { %>
+                <h1 class="text-center mt-3">Order List as of <%= today %></h1>
+                <div id="orders" class="tabcontent">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Date</th>
+                                <th>Agent</th>
+                                <th>Customer</th>
+                                <th>Order No.</th>
+                                <th>Total Amount</th>
+                                <th>Action</th>
+                            </tr>
+                            <%
+                            if(orderData.length > 0)
+                            {
+                                orderData.forEach(function(data){
+                            %>
+                            <tr>
+                                <td><%= data.order_date.toString().slice(4, 15) %></td>
+                                <td><%= data.agent %></td>
+                                <td><%= data.customer %></td>
+                                <td><%= data.order_id %></td>
+                                <td><%= data.total_amt %></td>
+                                <td>
+                                    <a href="/transactions/view/<%= data.order_id %>" class="btn btn-primary btn-sm">View</a>
+                                </td>
+                            </tr>
+                            <%
+                                });
+                            }
+                            else
+                            {
+                            %>
+                            <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>
+                            <%
+                            }
+                            %>
+                        </table>
+                    </div>
+                </div>
+                
+            <% } else { %>
+                    <div id="orders" class="tabcontent">
+                        <div><b>Customer:</b> <%= orderData.customer %></div>
+                        <div><b>Delivery Address:</b> <%= orderData.address %></div>
+                        <div><b>Schedule:</b> <%= orderData.expected_deliver_date.toString().slice(4, 15) %></div>
+                        <div><b>Gift:</b> <%= orderData.gift %></div>
+                        <div><b>Order No:</b> <%= orderData.order_id %></div>
+                        <div><b>Order Date:</b> <%= orderData.order_date.toString().slice(4, 15) %></div>
+                        <div><b>Agent:</b> <%= orderData.agent %></div>
+                        <div><b>Amount Due:</b> <%= orderData.total_amt %></div>
+                        <div>
+                            <b>Recipients:</b>
+                            <%
+                                if(recipientsData.length > 0)
+                                {
+                                    recipientsData.forEach(function(data){
+                                %>
+                                    [<%= data.recipient_name %>]  
+                                <%
+                                    });
+                                }%>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Item</th>
+                                <th>Color</th>
+                                <th>Personalization</th>
+                                <th>Qty</th>
+                                <th>Discount</th>
+                                <th>SRP</th>
+                                <th>Subtotal Amount</th>
+                            </tr>
+                            <%
+                            if(orderItemsData.length > 0)
+                            {
+                                orderItemsData.forEach(function(data){
+                            %>
+                            <tr>
+                                <td><%= data.item %></td>
+                                <td><%= data.color %></td>
+                                <td><%= data.personalization %></td>
+                                <td><%= data.qty_ordered %></td>
+                                <td><%= data.discount %></td>
+                                <!-- <td><%= data.subtotal_amt/((data.qty_ordered)*(1-data.discount)).toFixed(2) %></td> -->
+                                <td><%= Math.round((data.subtotal_amt/((data.qty_ordered)*(1-data.discount)).toFixed(2))*100)/100 %></td>
+                                <td><%= data.subtotal_amt %></td>
+                            </tr>
+                            <%
+                                });
+                            }
+                            else
+                            {
+                            %>
+                            <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>
+                            <%
+                            }
+                            %>
+                        </table>
+                    </div>
+            </div>
+
+
+                
+            <% } %>
+
+            
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    </body>
+</html>

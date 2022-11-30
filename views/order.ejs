@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Order Form</title>
+</head>
+    <body>
+        <div class="container">
+            <form method="POST" action="/order/add_order">
+                <div class="container">
+                    <h2>Order Items</h2>
+                    <table class="table table-hover my-5">
+                        <thead class="mb-3">
+                            <tr>
+                                <th>Item No.</th>
+                                <th>Item</th>
+                                <th>Color</th>
+                                <th>Personalization</th>
+                                <th>Qty</th>
+                                <th>Discount</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>        
+                        </tbody>
+                    </table>
+                    <div class="row m-0">
+                        <button type="button" class="btn btn-warning" onclick="addRow()">Add row</button>
+                    </div>
+                </div>
+                <h1 class="text-center text-primary mt-3 mb-3">Order Details</h1>
+                <div class="card">
+                    <div class="card-header">Please Input the Necessary Details</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>Agent</label>
+                            <select name="agt" id="agt" class="form-control" required>
+                                <option value="">Select Agent</option>
+                                <% for(var count = 0; count < agtData.length; count++) { %>
+                                <option value="<%= agtData[count].agt_id %>">[AGENT ID: <%= agtData[count].agt_id %>] <%= agtData[count].agent %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Customer</label>
+                            <select name="cust" id="cust" class="form-control" required>
+                                <option value="selectcustomer">Select Customer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Address Line 1</label>
+                            <input type="text" name="deliver_address_line_1" id="deliver_address_line_1" class="form-control" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Address Line 2</label>
+                            <input type="text" name="deliver_address_line_2" id="deliver_address_line_2" class="form-control"/>
+                        </div>
+                        <div class="mb-3">
+                            <select name="province" id="province" class="form-control" required>
+                                <option value="">Select Province</option>
+                                <% for(var count = 0; count < provData.length; count++) { %>
+                                <option value="<%= provData[count].id %>"><%= provData[count].name %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <select name="city" id="city" class="form-control" required>
+                                <option value="selectcity">Select City</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Schedule</label>
+                            <input type="date" name="expected_deliver_date" id="expected_deliver_date" class="form-control" required/>
+                        </div>
+                        <div class="mb-3">
+                            <select name="gift" id="gift" class="form-control" required>
+                                <option value="">Gift?</option>
+                                <option value="no">NO</option>
+                                <option value="yes">YES</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>List of Possible Recipients</label>
+                            <input type="text" name="recipients" id="recipients" class="form-control" required placeholder="e.g John Smith, Stephen Curry, Alex Pereira" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-0">
+                    <button type="Submit" class="btn btn-primary ml-auto">Submit</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
+<script>
+    function _(element)
+    {
+        return document.getElementById(element);
+    }
+
+    function fetch_data(parent_element, child_element, type)
+    {
+        fetch('/order/get_data?type='+type+'&parent_value='+parent_element.value+'').then(function(response){
+            return response.json();
+        }).then(function(responseData){
+
+            var html = '';
+
+            if(type == 'load_cust')
+            {
+                html = '<option value="selectcustomer">Select Customer</option>';
+            } 
+            
+            else if(type == 'load_city')
+            {
+                html = '<option value="selectcity">Select City</option>';
+            }
+
+            for(var count = 0; count < responseData.length; count++)
+            {
+                html += '<option value="'+responseData[count].id+'">'+responseData[count].name+'</option>';
+            }
+
+            child_element.innerHTML = html;
+        });
+    }
+
+    _('agt').onchange = function(){
+        fetch_data(_('agt'), _('cust'), 'load_cust');
+    };
+
+    _('province').onchange = function(){
+        fetch_data(_('province'), _('city'), 'load_city');
+    };
+
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+    dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+    mm = '0' + mm;
+    } 
+        
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("expected_deliver_date").setAttribute("min", today);
+
+
+
+    let i = 1;
+
+    function rowTemplate(i) {
+        return `<tr data-index=${i}>
+            <td>${i}</td>
+            <td>
+                <select name="item" id="item" class="form-control" required>
+                    <option value="selectitem">Select ITEM</option>
+                    <% for(var count = 0; count < productData.length; count++) { %>
+
+                    <option value="<%= productData[count].product_id %>">[ID: <%= productData[count].product_id %>] <%= productData[count].item %></option>
+
+                    <% } %>
+                </select>
+            </td>
+            <td>
+                <select name="color", id="color" class="form-control" required>
+                    <option value="">Color</option>
+                    <option value="1">Red</option>
+                    <option value="2">Orange</option>
+                    <option value="3">Yellow</option>
+                    <option value="4">Green</option>
+                    <option value="5">Blue</option>
+                    <option value="6">Purple</option>
+                    <option value="7">Pink</option>
+                    <option value="8">Black</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" name="personalization" id="personalization" class="form-control"/>
+            </td>
+            <td>
+                <input type="number" name="qty" id="qty" class="form-control" required/>
+            </td>
+            <td>
+                <input type="number" step="0.01" name="discount" id="discount" class="form-control" min=0 max=1 required/>
+            </td>
+            <td><i class="fa fa-times-circle" style="font-size: 22px; color: red;" onclick="removeRow(${i})"></i></td>
+        </tr>`
+    }
+
+    for (i = 1; i < 2; i ++) {
+    $('tbody').append(rowTemplate(i));
+    }
+
+    function removeRow(i) {
+    $("tbody").find(`tr[data-index='${i}']`).remove();
+    }
+
+    function addRow() {
+    $('tbody').append(rowTemplate(i));
+    i++;
+    }
+</script>
