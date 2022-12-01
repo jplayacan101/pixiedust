@@ -52,6 +52,31 @@ router.get("/", function(request, response, next){
 			ON p.product_id = pr.product_id;
 		`;
 
+	var queryProducts = `
+		SELECT p.product_id,
+			item,
+			category,
+			features,
+			pr.srp,
+			max_char_personalization,
+			is_active,
+			f.dimensions  AS fdimensions,
+			pl.dimensions AS pdimensions,
+			po.slots
+		FROM products p
+		LEFT JOIN folders f
+			ON p.product_id = f.product_id
+		LEFT JOIN planners pl
+			ON p.product_id = pl.product_id
+		LEFT JOIN pen_organizers po
+			ON p.product_id = po.product_id
+		LEFT JOIN (
+			SELECT product_id, effective_price as srp FROM prices t1 WHERE t1.effective_date = (SELECT max(t2.effective_date) FROM prices t2 WHERE t1.product_id = t2.product_id)
+		) pr
+		ON p.product_id = pr.product_id;
+			`;
+
+
 	database.query(queryProducts, function(error, data){
 
 		if(error)

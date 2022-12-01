@@ -203,7 +203,7 @@ router.post("/add_order", function(request, response, next){
 
                         counter++;
 
-                        if (counter === (itemList.length-1)) {
+                        if (counter === (itemList.length)) {
 
                             var counterrr = 0;
                                     
@@ -217,7 +217,6 @@ router.post("/add_order", function(request, response, next){
 
 
                                 database.query(queryRecipients, function(error, recipientsData) {
-                                    console.log("hello universe")
                                     counterrr++;
                                     if(error)
                                     {
@@ -226,7 +225,6 @@ router.post("/add_order", function(request, response, next){
                                     console.log(counterrr);
                                     if (counterrr === (recipientsList.length-1)) {
                                         for (l = 0; l < itemList.length ; l++) { 
-                                            console.log("Hello world");
                                             var queryColor = `
                                                 UPDATE product_entries
                                                 SET    qty_stock = qty_stock - "${qtyList[l]}"
