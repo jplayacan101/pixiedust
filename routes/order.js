@@ -111,11 +111,13 @@ router.post("/add_order", function(request, response, next){
         personalizationList = [personalizationList];
     }
     
-    // var queryProducts = `
-    //     SELECT *
-    //     FROM products 
-    //     ORDER BY product_id;
-    //     `;
+    var queryCust= `
+        SELECT Concat(cust_first_name, ' ', cust_last_name) "agent" FROM customers WHERE cust_id = "${custId}";
+        `;
+
+    database.query(queryCust, function(error, custData){
+        recipientsList.unshift(custData[0].agent);
+    });  
 
     var queryProducts = `
         SELECT product_id, MAX(effective_price) as srp
@@ -207,7 +209,7 @@ router.post("/add_order", function(request, response, next){
 
                             var counterrr = 0;
                                     
-                            for (j = 0; j < recipientsList.length ; j ++) {
+                            for (j = 0; j < recipientsList.length; j ++) {
 
                                 var queryRecipients = `
                                     INSERT INTO recipients
@@ -223,7 +225,7 @@ router.post("/add_order", function(request, response, next){
                                         throw error;
                                     }
                                     console.log(counterrr);
-                                    if (counterrr === (recipientsList.length-1)) {
+                                    if (counterrr === (recipientsList.length - 1)) {
                                         for (l = 0; l < itemList.length ; l++) { 
                                             var queryColor = `
                                                 UPDATE product_entries

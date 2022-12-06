@@ -107,7 +107,8 @@ router.post("/add_product_catalog", function(request, response, next){
 	var features = request.body.features;
 	var maxCharPersonalization = request.body.max_char_personalization;
 	var srp = request.body.srp;
-	var effectiveDate = request.body.effective_date;
+	// var effectiveDate = request.body.effective_date;
+	var effectiveDate = new Date().toISOString().split('T')[0];
 	var dimensions = request.body.dimensions;
 	var slots = request.body.slots;
 	var mostRecentId = -1
